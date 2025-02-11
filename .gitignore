@@ -3,6 +3,7 @@
 
 # Temporary files
 *.000
+.DS_Store
 *.bak
 *.bck
 *.kicad_pcb-bak
