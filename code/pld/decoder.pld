@@ -1,0 +1,69 @@
+Name      decoder;
+Partno    ;
+Date      11/11/25;
+Revision  01;
+Designer  Malcolm Harrow;
+Company   Malcolm Harrow, MIT License;
+Assembly  None;
+Location  None;
+Device    g22V10;
+
+/****************************************************************/
+/*                                                              */
+/* PLD code for the simple 4Mb SRAM card                        */
+/*                                                              */
+/****************************************************************/
+
+/* Pin Map
+       --------
+X     |1     24| VCC
+A20   |2     23| X
+A21   |3     22| X
+A22   |4     21| ODDRAMASEL
+A23   |5     20| ODDRAMBSEL
+RW    |6     19| EVENRAMASEL
+X     |7     18| EVENRAMBSEL
+LDS   |8     17| WR
+UDS   |9     16| X
+X     |10    15| X
+EXPSEL|11    14| X
+GND   |12    13| X
+       --------
+*/
+
+/**  Inputs  **/
+PIN [2..5]         = [A20..23];              
+PIN 6              = RW;
+PIN 8              = LDS;
+PIN 9              = UDS;
+PIN 11             = EXPSEL;
+
+/**  Outputs  **/
+PIN 21             = ODDRAMASEL;
+PIN 20             = ODDRAMBSEL;
+PIN 19             = EVENRAMASEL;
+PIN 18             = EVENRAMBSEL;
+
+/** Logic Equations **/
+/* The address decoder on the main board sets EXPSEL low using  */
+/* AS, FC2-0 and A23-20 as input.                               */
+/* DTACK is set if EXPSEL and LGEXP are low, we can set LGEXP   */
+/* via a jumper on the main board, so no need to handle DTACK.  */
+
+/* New memory map:                                              */
+/* Onboard RAM    : $00000000 - $000FFFFF (1MB)                 */
+/* Expansion RAM A: $00100000 - $002FFFFF (2MB)                 */
+/* Expansion RAM B: $00300000 - $004FFFFF (2MB)                 */
+/* Expansion space: $00500000 - $00DFFFFF (9MB)                 */
+/* ROM            : $00E00000 - $00EFFFFF (1MB)                 */
+/* IO             : $00F00000 - $FFFFFFFF (1MB)                 */
+
+
+FIELD addr = [A23..20];
+
+!EVENRAMASEL = !EXPSEL & !UDS & addr:['h'100000..2FFFFF];
+!EVENRAMBSEL = !EXPSEL & !UDS & addr:['h'300000..4FFFFF];
+!ODDRAMASEL  = !EXPSEL & !LDS & addr:['h'100000..2FFFFF];
+!ODDRAMBSEL  = !EXPSEL & !LDS & addr:['h'300000..4FFFFF];
+
+WR = !RW;
