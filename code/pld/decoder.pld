@@ -17,8 +17,8 @@ Device    g22V10;
 /* Pin Map
        --------
 X     |1     24| VCC
-A20   |2     23| X
-A21   |3     22| X
+A20   |2     23| DTACK
+A21   |3     22| DTACK_ENABLE
 A22   |4     21| ODDRAMASEL
 A23   |5     20| ODDRAMBSEL
 RW    |6     19| EVENRAMASEL
@@ -39,10 +39,12 @@ PIN 9              = UDS;
 PIN 11             = EXPSEL;
 
 /**  Outputs  **/
-PIN 21             = ODDRAMASEL;
-PIN 20             = ODDRAMBSEL;
-PIN 19             = EVENRAMASEL;
-PIN 18             = EVENRAMBSEL;
+PIN 23             = DTACK;
+PIN 22             = DTACK_ENABLE;
+PIN 21             = !ODDRAMASEL;
+PIN 20             = !ODDRAMBSEL;
+PIN 19             = !EVENRAMASEL;
+PIN 18             = !EVENRAMBSEL;
 
 /** Logic Equations **/
 /* The address decoder on the main board sets EXPSEL low using  */
@@ -59,11 +61,16 @@ PIN 18             = EVENRAMBSEL;
 /* IO             : $00F00000 - $FFFFFFFF (1MB)                 */
 
 
-FIELD addr = [A23..20];
+FIELD addr = [A23..0];
 
-!EVENRAMASEL = !EXPSEL & !UDS & addr:['h'100000..2FFFFF];
-!EVENRAMBSEL = !EXPSEL & !UDS & addr:['h'300000..4FFFFF];
-!ODDRAMASEL  = !EXPSEL & !LDS & addr:['h'100000..2FFFFF];
-!ODDRAMBSEL  = !EXPSEL & !LDS & addr:['h'300000..4FFFFF];
+EVENRAMASEL = !EXPSEL & !UDS & addr:['h'100000..2FFFFF];
+EVENRAMBSEL = !EXPSEL & !UDS & addr:['h'300000..4FFFFF];
+ODDRAMASEL  = !EXPSEL & !LDS & addr:['h'100000..2FFFFF];
+ODDRAMBSEL  = !EXPSEL & !LDS & addr:['h'300000..4FFFFF];
 
 WR = !RW;
+
+DTACK = 'b'0;
+DTACK.oe = DTACK_ENABLE;
+
+DTACK_ENABLE = EVENRAMASEL # EVENRAMBSEL # ODDRAMASEL # ODDRAMBSEL;
