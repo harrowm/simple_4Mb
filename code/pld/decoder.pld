@@ -49,8 +49,6 @@ PIN 18             = !EVENRAMBSEL;
 /** Logic Equations **/
 /* The address decoder on the main board sets EXPSEL low using  */
 /* AS, FC2-0 and A23-20 as input.                               */
-/* DTACK is set if EXPSEL and LGEXP are low, we can set LGEXP   */
-/* via a jumper on the main board, so no need to handle DTACK.  */
 
 /* New memory map:                                              */
 /* Onboard RAM    : $00000000 - $000FFFFF (1MB)                 */
